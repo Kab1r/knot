@@ -1,11 +1,12 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../preferences.dart';
 import 'schoolloop_library.dart';
 
 class SchoolLoop {
   static var sharedInstance = SchoolLoop();
 
-  var _keychain = FlutterSecureStorage();
+  var keychain = FlutterSecureStorage();
 
   var schoolList = List<School>();
 
@@ -22,17 +23,24 @@ class SchoolLoop {
       .firstWhere((possibleSchool) => schoolName == possibleSchool.name);
 
   Future<bool> login(
-      String schoolName, String username, String password) async {
-    _school = _findSchool(schoolName);
+      {String schoolName, String username, String password}) async {
+    if (schoolName == null || schoolName == '')
+      _school = await Preferences.getSchool();
+    else _school = _findSchool(schoolName);
+    if (username == null || username == '')
+      username = await Preferences.getUsername();
+    if (password == null || password == '')
+      password = await this.keychain.read(key: username);
     if (_school == null) return false;
     account = await Bus.login(_school.domainName, username, password);
     if (account == null) return false;
-    _keychain.write(key: username, value: password);
+    keychain.write(key: username, value: password);
     return true;
   }
 
   void logOut() {
-    _keychain.delete(key: account.username);
+    keychain.delete(key: account.username);
+    Preferences.clearAll();
     sharedInstance = SchoolLoop();
   }
 

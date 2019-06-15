@@ -85,15 +85,15 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 onPressed: () async {
                   if (await SchoolLoop.sharedInstance.login(
-                      _schoolNameTextField.textField.controller.text,
-                      _usernameController.text,
-                      _passwordController.text)) {
+                      schoolName:_schoolNameTextField.textField.controller.text,
+                      username:_usernameController.text,
+                      password:_passwordController.text)) {
                     Navigator.of(context).pushNamed('/loading');
                     await SchoolLoop.sharedInstance.fetchCourses();
                     await SchoolLoop.sharedInstance.fetchAssignments();
                     await SchoolLoop.sharedInstance.fetchGrades();
                     await SchoolLoop.sharedInstance.fetchNews();
-                    await Navigator.pushNamed(context, '/logged_in');
+                    Navigator.pushNamed(context, '/logged_in');
                   }
                 },
               ),

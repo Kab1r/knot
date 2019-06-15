@@ -11,6 +11,12 @@ class School {
     this.districtName = json['districtName'] ?? '';
   }
 
+  Map<String, dynamic> toJson() => {
+        'name': this.name,
+        'domainName': this.domainName,
+        'districtName': this.districtName,
+      };
+
   @override
   String toString() => this.name;
 }

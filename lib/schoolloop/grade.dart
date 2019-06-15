@@ -25,14 +25,15 @@ class Grade {
       this.isSubmissionlate = false});
 
   Grade.fromJson(Map<String, dynamic> json) {
-    this.title = json['title'] ?? '';
-    this.categoryName = json['categoryName'] ?? '';
+    print(json);
+    this.title = json['assignment']['title'] ?? '';
+    this.categoryName = json['assignment']['categoryName'] ?? '';
     this.percentScore = json['percentScore'] ?? '';
     this.score = json['score'] ?? '';
-    this.maxPoints = json['maxPoints'] ?? '';
+    this.maxPoints = json['assignment']['maxPoints'] ?? '';
     this.comment = json['comment'] ?? '';
-    this.systemID = json['systemID'] ?? '';
-    this.dueDate = json['dueDate'] ?? '';
+    this.systemID = json['assignment']['systemID'] ?? '';
+    this.dueDate = json['assignment']['dueDate'] ?? '';
     this.changedDate = json['changedDate'] ?? '';
     this.submissionTitle =
         (json['submission'] ?? Map<String, dynamic>())['fileName'] ??

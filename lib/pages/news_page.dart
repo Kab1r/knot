@@ -88,8 +88,10 @@ class _NewsWidgetState extends State<NewsWidget> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Flexible(
-                      //fit: FlexFit.loose,
+                    Container(
+                      constraints: BoxConstraints(
+                          maxWidth:
+                              MediaQuery.of(context).size.width * 0.8),
                       child: Text(
                         news.title,
                         style: TextStyle(

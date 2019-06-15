@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import 'pages/assignment_details_page.dart';
 import 'pages/course_details_page.dart';
+import 'pages/grade_details_page.dart';
 import 'pages/loading_page.dart';
 import 'pages/logged_in_pages.dart';
 import 'pages/login_page.dart';
@@ -21,6 +22,7 @@ class KnotApp extends StatelessWidget {
     '/logged_in': (context) => LoggedInPage(),
     '/assignment': (context) => AssignmentDetailsPage(),
     '/course': (context) => CourseDetailsPage(),
+    '/grade' : (context) => GradeDetailsPage(),
   };
 
   // This widget is the root of your application.

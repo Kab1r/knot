@@ -128,10 +128,7 @@ class __CourseWidgetState extends State<_CourseWidget> {
                       Text((isHidden) ? 'Hidden' : course.score),
                     ],
                   ),
-                  IconButton(
-                    icon: Icon(Icons.chevron_right),
-                    onPressed: () {},
-                  ),
+                  Icon(Icons.chevron_right),
                 ],
               ),
             ],
