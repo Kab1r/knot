@@ -1,12 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../schoolloop/news.dart';
 import '../schoolloop/schoolloop.dart';
+import '../shared_widgets.dart';
 import '../themes.dart';
-
-News currentNews;
 
 class NewsPage extends StatefulWidget {
   @override
@@ -14,36 +11,15 @@ class NewsPage extends StatefulWidget {
 }
 
 class _NewsPageState extends State<NewsPage> {
-  RefreshController _refreshController;
-
-  @override
-  void initState() {
-    super.initState();
-    _refreshController = RefreshController(initialRefresh: false);
-  }
-
-  @override
-  void dispose() {
-    _refreshController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.fromLTRB(5, 25, 5, 5),
-      child: SmartRefresher(
-        enablePullDown: true,
-        enablePullUp: true,
-        header: WaterDropMaterialHeader(
-          backgroundColor: primaryTheme.primaryColor,
-        ),
-        controller: _refreshController,
-        onLoading: () => setState(() async {
-              await SchoolLoop.sharedInstance.fetchNews();
-              _refreshController.loadComplete();
-            }),
-        onRefresh: () => _refreshController.refreshCompleted(),
+      child: RefreshIndicator(
+        onRefresh: () async {
+          SchoolLoop.sharedInstance.fetchNews();
+          setState(() {});
+        },
         child: ListView.builder(
           itemCount: SchoolLoop.sharedInstance.news.length,
           itemBuilder: (_, int index) =>
@@ -73,11 +49,10 @@ class _NewsWidgetState extends State<NewsWidget> {
     return Container(
       child: GestureDetector(
         onTap: () => setState(() {
-              currentNews = this.news;
-              // TODO Nav push NewsDetails
+              Navigator.pushNamed(context, '/news', arguments: this.news);
             }),
         child: Card(
-          color: primaryTheme.backgroundColor,
+          color: ThemeColors.backgroundColor,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -89,24 +64,24 @@ class _NewsWidgetState extends State<NewsWidget> {
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     Container(
-                      constraints: BoxConstraints(
-                          maxWidth:
-                              MediaQuery.of(context).size.width * 0.8),
+                      width: getTextWidth(context),
                       child: Text(
                         news.title,
                         style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: primaryTheme.accentColor),
+                          fontWeight: FontWeight.bold,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    Text(
-                      news.authorName,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        color: primaryTheme.accentColor,
+                    Container(
+                      width: getTextWidth(context),
+                      child: Text(
+                        news.authorName,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -115,7 +90,6 @@ class _NewsWidgetState extends State<NewsWidget> {
                 color: Colors.transparent,
                 child: Icon(
                   Icons.chevron_right,
-                  color: primaryTheme.accentColor,
                 ),
               )
             ],

@@ -1,8 +1,5 @@
-import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'schoolloop/schoolloop_library.dart';
 
 class Preferences {
   static Future<bool> getIsHidden() async =>
@@ -11,12 +8,11 @@ class Preferences {
   static Future<void> setIsHidden(bool value) async =>
       (await SharedPreferences.getInstance()).setBool('isHidden', value);
 
-  static Future<School> getSchool() async => School.fromJson(
-      json.decode((await SharedPreferences.getInstance()).getString('school') ?? '{}'));
 
-  static Future<void> setSchool(School value) async =>
-      json.encode((await SharedPreferences.getInstance())
-          .setString('school', json.encode(value.toJson())));
+  static Future<String> getSchoolName() async => (await SharedPreferences.getInstance()).getString('schoolName') ?? '';
+
+  static Future<void> setSchoolName(String value) async => (await SharedPreferences.getInstance()).setString('schoolName', value);
+
 
   static Future<String> getUsername() async =>
       (await SharedPreferences.getInstance()).getString('username') ?? '';

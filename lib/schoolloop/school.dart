@@ -19,4 +19,10 @@ class School {
 
   @override
   String toString() => this.name;
+
+  bool isNullOrEmpty() =>
+      this == null ||
+      this.name.isEmpty ||
+      this.districtName.isEmpty ||
+      this.domainName.isEmpty;
 }

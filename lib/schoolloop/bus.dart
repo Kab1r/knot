@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:flutter_udid/flutter_udid.dart';
 import 'schoolloop_library.dart';
 
 class Bus {
@@ -14,16 +16,19 @@ class Bus {
           .forEach((jsonSchool) => schools.add(School.fromJson(jsonSchool)));
     } else
       throw Exception(response.body);
+    debugPrint('Schools Updated');
     return schools;
   }
 
   static Future<Account> login(
       String domainName, String username, String password) async {
-    final url = Constants.loginUrl(domainName);
+    final url = await Constants.loginUrl(domainName);
     final response = await _authenticatedRequest(url, username, password);
     if (response.statusCode == 200) {
       var jsonAccount = json.decode(response.body);
       return Account.login(username, password, jsonAccount);
+    } else if (response.statusCode == 401) {
+      throw HttpException(response.statusCode.toString());
     } else
       throw Exception(response.body);
   }
@@ -39,6 +44,7 @@ class Bus {
       var jsonCourseList = json.decode(response.body);
       jsonCourseList
           .forEach((jsonCourse) => courseList.add(Course.fromJson(jsonCourse)));
+      debugPrint('Courses Updated');
       return courseList;
     } else
       throw Exception(
@@ -55,17 +61,11 @@ class Bus {
       var jsonAssignments = json.decode(response.body);
       jsonAssignments.forEach((jsonAssignment) =>
           assignmentList.add(Assignment.fromJson(jsonAssignment)));
+      debugPrint('Assignments Updated');
       return assignmentList;
     } else
       throw Exception(
           response.body + ' Status Code: ' + response.statusCode.toString());
-  }
-
-  static Future<http.Response> _authenticatedRequest(
-      Uri url, String username, String password) async {
-    final String _basicAuth =
-        'Basic ' + base64Encode(utf8.encode('$username:$password'));
-    return await http.get(url, headers: {'authorization': _basicAuth});
   }
 
   static Future<void> fetchGrades(
@@ -81,13 +81,16 @@ class Bus {
         course.categoriesFromJson(jsonData['categories']);
         course.cutoffsFromJson(jsonData['GradingScale']['Cutoffs']);
         course.trendScoresFromJson(jsonData['trendScores']);
+        account.setSchoolID(jsonData['student']['schoolID']);
       } else
         throw Exception(response.body);
     });
+    debugPrint('Grades Updated');
   }
 
   static Future<List<News>> fetchNews(
       String domainName, Account account) async {
+    debugPrint('News Updated');
     final url = Constants.newsUrl(domainName, account.studentID);
     final response =
         await _authenticatedRequest(url, account.username, account.password);
@@ -100,4 +103,23 @@ class Bus {
     } else
       throw Exception(response.body);
   }
+
+  static Future<http.Response> _authenticatedRequest(
+      Uri url, String username, String password) async {
+    final String _basicAuth =
+        'Basic ' + base64Encode(utf8.encode('$username:$password'));
+
+    Map<String, String> headers = {
+      'authorization': _basicAuth,
+    };
+    if (isHashed(password))
+      headers.addAll({
+        'SL-HASH': 'true',
+        'SL-UUID': await FlutterUdid.udid,
+      });
+    return await http.get(url, headers: headers);
+  }
+
+  static bool isHashed(String password) =>
+      RegExp("^\\\$..\\\$..\\\$").hasMatch(password);
 }

@@ -4,6 +4,7 @@ class Grade {
   String percentScore;
   String score;
   String maxPoints;
+  bool isZero;
   String comment;
   String systemID;
   String dueDate;
@@ -17,6 +18,7 @@ class Grade {
       this.percentScore = '',
       this.score = '',
       this.maxPoints = '',
+      this.isZero = false,
       this.comment = '',
       this.systemID = '',
       this.dueDate = '',
@@ -25,12 +27,12 @@ class Grade {
       this.isSubmissionlate = false});
 
   Grade.fromJson(Map<String, dynamic> json) {
-    print(json);
     this.title = json['assignment']['title'] ?? '';
     this.categoryName = json['assignment']['categoryName'] ?? '';
     this.percentScore = json['percentScore'] ?? '';
     this.score = json['score'] ?? '';
     this.maxPoints = json['assignment']['maxPoints'] ?? '';
+    this.isZero = json['zero'] == 'true';
     this.comment = json['comment'] ?? '';
     this.systemID = json['assignment']['systemID'] ?? '';
     this.dueDate = json['assignment']['dueDate'] ?? '';

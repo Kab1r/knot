@@ -1,3 +1,4 @@
+import 'package:flutter_udid/flutter_udid.dart';
 class Constants {
   static final String version = '3';
   static final String devToken = '';
@@ -11,8 +12,8 @@ class Constants {
 
   static Uri schoolsUrl() => Uri.https(_genericAuthority, 'mapi/schools');
 
-  static Uri loginUrl(String domainName) => Uri.https(domainName, 'mapi/login',
-      {'version': version, 'devToken': devToken, 'devOS': devOS, 'year': year});
+  static Future<Uri> loginUrl(String domainName) async => Uri.https(domainName, 'mapi/login',
+      {'version': version, 'devToken': devToken, 'devOS': devOS, 'year': year, 'uuid': await FlutterUdid.udid});
 
   static Uri courseUrl(String domainName, String studentID) =>
       Uri.https(domainName, 'mapi/report_card', {'studentID': studentID});

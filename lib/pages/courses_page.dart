@@ -1,12 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
-
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../schoolloop/course.dart';
 import '../schoolloop/schoolloop.dart';
 import '../themes.dart';
 
-Course currentCourse;
 bool isHidden = false;
 
 class CoursesPage extends StatefulWidget {
@@ -15,19 +12,6 @@ class CoursesPage extends StatefulWidget {
 }
 
 class _CoursesPageState extends State<CoursesPage> {
-  RefreshController _refreshController;
-
-  @override
-  void initState() {
-    super.initState();
-    _refreshController = RefreshController(initialRefresh: false);
-  }
-
-  @override
-  void dispose() {
-    _refreshController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,23 +19,18 @@ class _CoursesPageState extends State<CoursesPage> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => setState(() => isHidden = !isHidden),
         label: Text((isHidden) ? 'Unhide' : 'Hide'),
-        icon: Icon(Icons.remove_red_eye),
-        backgroundColor: primaryTheme.backgroundColor,
+        icon:
+            Icon((isHidden) ? FontAwesomeIcons.eye : FontAwesomeIcons.eyeSlash),
+        backgroundColor: ThemeColors.primaryColor,
       ),
       body: Container(
         padding: EdgeInsets.fromLTRB(5, 25, 5, 5),
-        child: SmartRefresher(
-          enablePullDown: true,
-          enablePullUp: true,
-          header: WaterDropMaterialHeader(
-            backgroundColor: primaryTheme.primaryColor,
-          ),
-          controller: _refreshController,
-          onLoading: () => setState(() async {
-                await SchoolLoop.sharedInstance.fetchCourses();
-                _refreshController.loadComplete();
-              }),
-          onRefresh: () => _refreshController.refreshCompleted(),
+        child: RefreshIndicator(
+          onRefresh: () async {
+            await SchoolLoop.sharedInstance.fetchCourses();
+            await SchoolLoop.sharedInstance.fetchGrades();
+            setState(() {});
+          },
           child: ListView.builder(
               itemCount: SchoolLoop.sharedInstance.courses.length,
               itemBuilder: (_, int index) {
@@ -84,54 +63,68 @@ class __CourseWidgetState extends State<_CourseWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: GestureDetector(
-        onTap: () => setState(() {
-              currentCourse = this.course;
-              Navigator.of(context).pushNamed('/course');
-            }),
-        child: Card(
-          color: primaryTheme.backgroundColor,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(5),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Text(course.period),
-                    Container(
-                      padding: EdgeInsets.all(5),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            course.courseName,
-                            style: TextStyle(fontWeight: FontWeight.bold),
+      child: Center(
+        child: GestureDetector(
+          onTap: () => setState(() {
+                Navigator.of(context).pushNamed('/course', arguments: this.course);
+              }),
+          child: Card(
+            color: ThemeColors.backgroundColor,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    padding: EdgeInsets.all(5),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        CircleAvatar(
+                          radius: 10.0,
+                          backgroundColor: ThemeColors.accentColor,
+                          child: Container(
+                            padding: const EdgeInsets.all(1),
+                            child: Text(
+                              course.period,
+                              style: TextStyle(color: Colors.black),
+                            ),
                           ),
-                          Text(course.teacherName),
-                        ],
-                      ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(5),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                course.courseName,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              Text(course.teacherName),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
+                  ),
+                ),
+                Row(
+                  children: <Widget>[
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: <Widget>[
+                        Text(
+                          (isHidden) ? '' : course.grade,
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text((isHidden) ? 'Hidden' : course.score),
+                      ],
+                    ),
+                    Icon(Icons.chevron_right),
                   ],
                 ),
-              ),
-              Row(
-                children: <Widget>[
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: <Widget>[
-                      Text(
-                        (isHidden) ? 'Hidden' : course.grade,
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Text((isHidden) ? 'Hidden' : course.score),
-                    ],
-                  ),
-                  Icon(Icons.chevron_right),
-                ],
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

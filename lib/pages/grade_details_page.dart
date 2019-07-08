@@ -1,34 +1,27 @@
 import 'package:flutter/material.dart';
 
 import '../schoolloop/grade.dart';
-import 'course_details_page.dart';
 
-class GradeDetailsPage extends StatefulWidget {
-  final Grade grade = currentGrade;
-
-  @override
-  _GradeDetailsPageState createState() => _GradeDetailsPageState(this.grade);
-}
-
-class _GradeDetailsPageState extends State<GradeDetailsPage> {
+class GradeDetailsPage extends StatelessWidget {
   final Grade grade;
-
-  _GradeDetailsPageState(this.grade);
+  GradeDetailsPage(this.grade);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
         padding: EdgeInsets.fromLTRB(10, 50, 10, 20),
-        child: Column(
-          children: <Widget>[
-            Text(grade.title),
-            Text(grade.categoryName),
-            Text(grade.score + '/' + grade.maxPoints),
-            Text(grade.percentScore),
-            Text(grade.comment),
-            Text(grade.submissionTitle)
-          ],
+        child: Center(
+                  child: Column(
+            children: <Widget>[
+              Text(grade.title, style: TextStyle(fontWeight: FontWeight.bold),),
+              Text(grade.categoryName),
+              Text(grade.score + '/' + grade.maxPoints),
+              Text(grade.percentScore),
+              Text(grade.comment),
+              Text(grade.submissionTitle)
+            ],
+          ),
         ),
       ),
     );

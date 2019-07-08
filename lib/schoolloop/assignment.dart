@@ -2,7 +2,9 @@ class Assignment {
   String title;
   String description;
   String courseName;
+  String categoryName;
   String dueDate;
+  String maxPoints;
   Map<String, String> links;
   String iD;
   bool isCompleted = false;
@@ -19,7 +21,9 @@ class Assignment {
     this.title = json['title'] ?? '';
     this.description = json['description'] ?? '';
     this.courseName = json['courseName'] ?? '';
+    this.categoryName = json['categoryName'] ?? '';
     this.dueDate = json['dueDate'] ?? '';
+    this.maxPoints = json['maxPoints'] ?? '';
     this.links = json['links'] ?? const {'': ''};
     this.iD = json['iD'] ?? '';
   }

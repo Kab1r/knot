@@ -1,12 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../schoolloop/assignment.dart';
 import '../schoolloop/schoolloop.dart';
 import '../themes.dart';
-
-Assignment currentAssignment;
 
 class AssignmentsPage extends StatefulWidget {
   @override
@@ -14,17 +10,13 @@ class AssignmentsPage extends StatefulWidget {
 }
 
 class _AssignmentsPageState extends State<AssignmentsPage> {
-  RefreshController _refreshController;
-
   @override
   void initState() {
     super.initState();
-    _refreshController = RefreshController(initialRefresh: false);
   }
 
   @override
   void dispose() {
-    _refreshController.dispose();
     super.dispose();
   }
 
@@ -32,18 +24,11 @@ class _AssignmentsPageState extends State<AssignmentsPage> {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.fromLTRB(5, 25, 5, 5),
-      child: SmartRefresher(
-        enablePullDown: true,
-        enablePullUp: true,
-        header: WaterDropMaterialHeader(
-          backgroundColor: primaryTheme.primaryColor,
-        ),
-        controller: _refreshController,
-        onLoading: () => setState(() async {
-              await SchoolLoop.sharedInstance.fetchAssignments();
-              _refreshController.loadComplete();
-            }),
-        onRefresh: () => _refreshController.refreshCompleted(),
+      child: RefreshIndicator(
+        onRefresh: () async {
+          await SchoolLoop.sharedInstance.fetchAssignments();
+          setState(() {});
+        },
         child: ListView.builder(
           itemCount: SchoolLoop.sharedInstance.assignments.length,
           itemBuilder: (_, int index) =>
@@ -73,44 +58,56 @@ class _AssignmentWidgetState extends State<AssignmentWidget> {
     return Container(
       child: GestureDetector(
         onTap: () => setState(() {
-              currentAssignment = this.assignment;
-              Navigator.of(context).pushNamed('/assignment');
+              Navigator.of(context)
+                  .pushNamed('/assignment', arguments: this.assignment);
             }),
         child: Card(
-          color: primaryTheme.backgroundColor,
+          color: ThemeColors.backgroundColor,
           child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(5),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      assignment.title,
-                      textAlign: TextAlign.left,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: primaryTheme.accentColor,
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.all(5),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        assignment.title,
+                        textAlign: TextAlign.left,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    Text(
-                      assignment.courseName,
-                      textAlign: TextAlign.left,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        color: primaryTheme.accentColor,
+                      Text(
+                        assignment.courseName + ' - ' + assignment.categoryName,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
+              ),
+              Column(
+                children: <Widget>[
+                  Text(
+                    'Points',
+                    style: TextStyle(fontSize: 8),
+                  ),
+                  Text(
+                    assignment.maxPoints ?? '',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
               ),
               Material(
                 color: Colors.transparent,
                 child: Icon(
                   Icons.chevron_right,
-                  color: primaryTheme.accentColor,
+                  color: ThemeColors.accentColor,
                 ),
               ),
             ],

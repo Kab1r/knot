@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:rounded_floating_app_bar/rounded_floating_app_bar.dart';
@@ -7,12 +6,10 @@ import '../schoolloop/course.dart';
 import '../schoolloop/grade.dart';
 import '../shared_widgets.dart';
 import '../themes.dart';
-import 'courses_page.dart';
-
-Grade currentGrade;
 
 class CourseDetailsPage extends StatefulWidget {
-  final Course course = currentCourse;
+  final Course course;
+  CourseDetailsPage(this.course);
 
   @override
   _CourseDetailsPageState createState() => _CourseDetailsPageState(this.course);
@@ -26,40 +23,46 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: NestedScrollView(
-        headerSliverBuilder: (context, isInnerBoxScroll) => [
-              RoundedFloatingAppBar(
-                backgroundColor: primaryTheme.backgroundColor,
-                actions: <Widget>[
-                  IconButton(
-                    icon: Icon(Icons.arrow_back),
-                    onPressed: () => Navigator.pop(context),
-                  )
-                ],
-                floating: true,
-                snap: true,
-                title: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Container(child: icon, constraints: BoxConstraints(maxHeight: 40),),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      child: Text(
-                        "Grades",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 18),
-                      ),
-                    ),
+      body: Container(
+        padding: EdgeInsets.fromLTRB(1.0, 5.0, 1.0, 1.0),
+        child: NestedScrollView(
+          headerSliverBuilder: (context, isInnerBoxScroll) => [
+                RoundedFloatingAppBar(
+                  backgroundColor: ThemeColors.backgroundColor,
+                  actions: <Widget>[
+                    IconButton(
+                      icon: Icon(Icons.arrow_back),
+                      onPressed: () => Navigator.pop(context),
+                    )
                   ],
+                  floating: true,
+                  snap: true,
+                  title: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Container(
+                        child: icon,
+                        constraints: BoxConstraints(maxHeight: 40),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: Text(
+                          "Grades",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-        body: Container(
-          padding: EdgeInsets.fromLTRB(10, 50, 10, 20),
-          child: ListView.builder(
-            itemCount: this.course.grades.length,
-            itemBuilder: (_, int index) =>
-                _GradeWidget(this.course.grades[index]),
+              ],
+          body: Container(
+            padding: EdgeInsets.fromLTRB(10, 50, 10, 20),
+            child: ListView.builder(
+              itemCount: this.course.grades.length,
+              itemBuilder: (_, int index) =>
+                  _GradeWidget(this.course.grades[index]),
+            ),
           ),
         ),
       ),
@@ -86,36 +89,53 @@ class __GradeWidgetState extends State<_GradeWidget> {
     return Container(
       child: GestureDetector(
         onTap: () => setState(() {
-              currentGrade = this.grade;
-              Navigator.of(context).pushNamed('/grade'); // TODO
+              Navigator.of(context).pushNamed('/grade', arguments: this.grade);
             }),
         child: Card(
-          color: primaryTheme.backgroundColor,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Column(
-                children: <Widget>[
-                  Container(
-                    constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width * 0.8),
-                    child: Text(
-                      this.grade.title,
-                      textAlign: TextAlign.left,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+          color: (grade.isZero)
+              ? Colors.red
+              : ThemeColors.backgroundColor,
+          child: Container(
+            padding: EdgeInsets.all(4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Expanded(
+                  flex: 1,
+                  //width: getTextWidth(context) / 2,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        this.grade.title,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.left,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        this.grade.categoryName,
+                        textAlign: TextAlign.left,
+                      ),
+                    ],
                   ),
-                  Text(
-                    this.grade.categoryName,
-                    textAlign: TextAlign.left,
-                  )
-                ],
-              ),
-              Column(
-                children: <Widget>[],
-              ),
-              Icon(Icons.chevron_right),
-            ],
+                ),
+                Row(
+                  children: <Widget>[
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: <Widget>[
+                        Text(
+                          this.grade.percentScore,
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(this.grade.score + '/' + this.grade.maxPoints),
+                      ],
+                    ),
+                    Icon(Icons.chevron_right),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
